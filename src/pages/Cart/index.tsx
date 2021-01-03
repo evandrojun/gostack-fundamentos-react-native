@@ -27,6 +27,10 @@ import { useCart } from '../../hooks/cart';
 
 import formatValue from '../../utils/formatValue';
 
+interface Type {
+  item: Product;
+}
+
 interface Product {
   id: string;
   title: string;
@@ -38,24 +42,20 @@ interface Product {
 const Cart: React.FC = () => {
   const { increment, decrement, products } = useCart();
 
-  function handleIncrement(id: string): void {
-    // TODO
-  }
-
-  function handleDecrement(id: string): void {
-    // TODO
-  }
-
   const cartTotal = useMemo(() => {
-    // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
+    const sum = products
+      .map((product) => product.price * product.quantity)
+      .reduce((total, value) => total + value, 0);
 
-    return formatValue(0);
+    return formatValue(sum);
   }, [products]);
 
   const totalItensInCart = useMemo(() => {
-    // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
+    const itemsInCart = products
+      .map((product) => product.quantity)
+      .reduce((total, value) => total + value, 0);
 
-    return 0;
+    return itemsInCart;
   }, [products]);
 
   return (
@@ -63,12 +63,12 @@ const Cart: React.FC = () => {
       <ProductContainer>
         <ProductList
           data={products}
-          keyExtractor={item => item.id}
+          keyExtractor={(item: { id: string }) => item.id}
           ListFooterComponent={<View />}
           ListFooterComponentStyle={{
             height: 80,
           }}
-          renderItem={({ item }: { item: Product }) => (
+          renderItem={({ item }: Type) => (
             <Product>
               <ProductImage source={{ uri: item.image_url }} />
               <ProductTitleContainer>
@@ -90,13 +90,13 @@ const Cart: React.FC = () => {
               <ActionContainer>
                 <ActionButton
                   testID={`increment-${item.id}`}
-                  onPress={() => handleIncrement(item.id)}
+                  onPress={() => increment(item.id)}
                 >
                   <FeatherIcon name="plus" color="#E83F5B" size={16} />
                 </ActionButton>
                 <ActionButton
                   testID={`decrement-${item.id}`}
-                  onPress={() => handleDecrement(item.id)}
+                  onPress={() => decrement(item.id)}
                 >
                   <FeatherIcon name="minus" color="#E83F5B" size={16} />
                 </ActionButton>
